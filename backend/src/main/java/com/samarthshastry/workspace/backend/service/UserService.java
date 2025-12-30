@@ -3,6 +3,7 @@ package com.samarthshastry.workspace.backend.service;
 import com.samarthshastry.workspace.backend.model.User;
 import com.samarthshastry.workspace.backend.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepo userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepo.findAll();
@@ -24,6 +26,25 @@ public class UserService {
 
     public Optional<User> getUserByEmail(String email) {
         return userRepo.findByEmail(email);
+    }
+
+    public User registerUser(String email, String rawPassword) {
+        if (userRepo.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+        User user = new User();
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        return userRepo.save(user);
+    }
+
+    public boolean authenticateUser(String email, String rawPassword) {
+        Optional<User> userOpt = userRepo.findByEmail(email);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return passwordEncoder.matches(rawPassword, user.getPasswordHash());
+        }
+        return false;
     }
 
     public User updateEmail(UUID id, String newEmail) {
