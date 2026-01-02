@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 
 export interface LoginRequest {
   email: string;
@@ -28,11 +29,15 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    // Load user from localStorage on init
-    const token = this.getToken();
-    if (token) {
-      // TODO: Decode JWT and set current user
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      const token = this.getToken();
+      if (token) {
+        // TODO: Decode JWT and set current user
+      }
     }
   }
 
@@ -49,12 +54,17 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem(this.tokenKey);
+    }
     this.currentUserSubject.next(null);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem(this.tokenKey);
+    }
+    return null;
   }
 
   isAuthenticated(): boolean {
@@ -62,7 +72,9 @@ export class AuthService {
   }
 
   private handleAuthResponse(response: AuthResponse): void {
-    localStorage.setItem(this.tokenKey, response.token);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(this.tokenKey, response.token);
+    }
     this.currentUserSubject.next(response.user);
   }
 }
