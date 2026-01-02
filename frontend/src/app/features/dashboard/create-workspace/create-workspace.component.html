@@ -1,0 +1,43 @@
+<div class="create-workspace-modal">
+  <div class="modal-header">
+    <h2>Create New Workspace</h2>
+    <button class="close-btn" (click)="cancel()">✕</button>
+  </div>
+
+  <form [formGroup]="workspaceForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="name">Workspace Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        formControlName="name"
+        placeholder="e.g., Marketing Team"
+      >
+      <div class="error-message" *ngIf="workspaceForm.get('name')?.invalid && workspaceForm.get('name')?.touched">
+        <span *ngIf="workspaceForm.get('name')?.errors?.['required']">Name is required</span>
+        <span *ngIf="workspaceForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        formControlName="description"
+        placeholder="What's this workspace for?"
+        rows="4"
+      ></textarea>
+    </div>
+
+    <div class="error-message" *ngIf="error">{{ error }}</div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="loading">
+        Cancel
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="workspaceForm.invalid || loading">
+        {{ loading ? 'Creating...' : 'Create Workspace' }}
+      </button>
+    </div>
+  </form>
+</div>

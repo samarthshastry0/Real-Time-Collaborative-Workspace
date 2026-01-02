@@ -1,11 +1,74 @@
 <div class="dashboard-container">
+  <!-- Header -->
   <header class="dashboard-header">
-    <h1>Workspace Dashboard</h1>
-    <button (click)="logout()" class="btn-logout">Logout</button>
+    <div class="header-content">
+      <h1>My Workspaces</h1>
+      <div class="header-actions">
+        <button class="btn-create" (click)="openCreateModal()">
+          + New Workspace
+        </button>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </div>
+    </div>
   </header>
 
+  <!-- Main Content -->
   <main class="dashboard-content">
-    <h2>Welcome to your workspace!</h2>
-    <p>You are successfully authenticated.</p>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading workspaces...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-state">
+      <p>{{ error }}</p>
+      <button (click)="loadWorkspaces()">Retry</button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && workspaces.length === 0" class="empty-state">
+      <div class="empty-icon">📁</div>
+      <h2>No Workspaces Yet</h2>
+      <p>Create your first workspace to get started!</p>
+      <button class="btn-primary" (click)="openCreateModal()">
+        Create Workspace
+      </button>
+    </div>
+
+    <!-- Workspace Grid -->
+    <div *ngIf="!loading && !error && workspaces.length > 0" class="workspace-grid">
+      <div *ngFor="let workspace of workspaces" 
+           class="workspace-card"
+           (click)="viewWorkspace(workspace.id)">
+        <div class="workspace-header">
+          <h3>{{ workspace.name }}</h3>
+          <span class="workspace-badge" *ngIf="isOwner(workspace)">Owner</span>
+        </div>
+        <p class="workspace-description">
+          {{ workspace.description || 'No description' }}
+        </p>
+        <div class="workspace-footer">
+          <div class="workspace-meta">
+            <span class="meta-item">
+              👥 {{ getMemberCount(workspace) }} members
+            </span>
+            <span class="meta-item">
+              👤 {{ workspace.owner.email }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  <!-- Create Workspace Modal -->
+  <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-create-workspace 
+        (workspaceCreated)="onWorkspaceCreated()"
+        (cancelled)="closeCreateModal()">
+      </app-create-workspace>
+    </div>
+  </div>
 </div>
