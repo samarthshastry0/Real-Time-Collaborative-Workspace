@@ -1,4 +1,4 @@
-package com.samarthshastry.workspace.backend;
+package com.samarthshastry.workspace.backend.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
