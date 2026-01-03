@@ -14,6 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/workspaces")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
@@ -41,79 +42,73 @@ public class WorkspaceController {
     }
 
     @PostMapping
-    public ResponseEntity<Workspace> createWorkspace(@RequestBody Map<String, String> request) {
-        try {
-            String name = request.get("name");
-            String description = request.get("description");
-            UUID ownerId = UUID.fromString(request.get("ownerId"));
+    public ResponseEntity<?> createWorkspace(@RequestBody Map<String, String> request) {
 
-            if (name == null || name.isBlank()) {
-                return ResponseEntity.badRequest().build();
-            }
+        String name = request.get("name");
+        String description = request.get("description");
+        String ownerIdRaw = request.get("ownerId");
 
-            Workspace workspace = workspaceService.createWorkspace(name, description, ownerId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(workspace);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body("Workspace name is required");
         }
+
+        if (ownerIdRaw == null) {
+            return ResponseEntity.badRequest().body("ownerId is required");
+        }
+
+        UUID ownerId;
+        try {
+            ownerId = UUID.fromString(ownerIdRaw);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid ownerId format");
+        }
+
+        Workspace workspace = workspaceService.createWorkspace(
+                name,
+                description,
+                ownerId
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(workspace);
     }
 
     @PostMapping("/{workspaceId}/members/{userId}")
-    public ResponseEntity<Workspace> addMember(
+    public ResponseEntity<?> addMember(
             @PathVariable UUID workspaceId,
             @PathVariable UUID userId) {
-        try {
-            Workspace workspace = workspaceService.addMember(workspaceId, userId);
-            return ResponseEntity.ok(workspace);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+
+        Workspace workspace = workspaceService.addMember(workspaceId, userId);
+        return ResponseEntity.ok(workspace);
     }
 
-    @DeleteMapping("/{workspaceId}/members/{userId}")
-    public ResponseEntity<Workspace> removeMember(
-            @PathVariable UUID workspaceId,
-            @PathVariable UUID userId) {
-        try {
-            Workspace workspace = workspaceService.removeMember(workspaceId, userId);
-            return ResponseEntity.ok(workspace);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-@PatchMapping("/{id}/name")
-    public ResponseEntity<Workspace> updateWorkspaceName(
+    @PatchMapping("/{id}/name")
+    public ResponseEntity<?> updateWorkspaceName(
             @PathVariable UUID id,
             @RequestBody Map<String, String> request) {
-        try {
-            String name = request.get("name");
-            if (name == null || name.isBlank()) {
-                return ResponseEntity.badRequest().build();
-            }
-            
-            Workspace workspace = workspaceService.updateWorkspaceName(id, name);
-            return ResponseEntity.ok(workspace);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+
+        String name = request.get("name");
+
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body("Name cannot be empty");
         }
+
+        Workspace workspace = workspaceService.updateWorkspaceName(id, name);
+        return ResponseEntity.ok(workspace);
     }
 
     @PatchMapping("/{id}/description")
-    public ResponseEntity<Workspace> updateWorkspaceDescription(
+    public ResponseEntity<?> updateWorkspaceDescription(
             @PathVariable UUID id,
             @RequestBody Map<String, String> request) {
-        try {
-            String description = request.get("description");
-            if (description == null) {
-                return ResponseEntity.badRequest().build();
-            }
-            
-            Workspace workspace = workspaceService.updateWorkspaceDescription(id, description);
-            return ResponseEntity.ok(workspace);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+
+        String description = request.get("description");
+
+        if (description == null) {
+            return ResponseEntity.badRequest().body("Description is required");
         }
+
+        Workspace workspace = workspaceService.updateWorkspaceDescription(id, description);
+        return ResponseEntity.ok(workspace);
     }
 
     @DeleteMapping("/{id}")

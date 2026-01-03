@@ -18,6 +18,9 @@ export class CreateWorkspaceComponent {
   loading = false;
   error = '';
 
+  // TEMP: replace with a real UUID from your DB
+  private readonly TEMP_OWNER_ID = 'bd51eb29-36b6-405e-865c-4fa8f6c0031f';
+
   constructor(
     private fb: FormBuilder,
     private workspaceService: WorkspaceService
@@ -25,7 +28,7 @@ export class CreateWorkspaceComponent {
     this.workspaceForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.maxLength(500)]],
-      ownerId: ['user-id-placeholder'] // We'll need to get this from auth
+      ownerId: [this.TEMP_OWNER_ID, Validators.required]
     });
   }
 
@@ -37,13 +40,11 @@ export class CreateWorkspaceComponent {
     this.loading = true;
     this.error = '';
 
-    // TODO: Get actual user ID from auth service
-    this.workspaceForm.patchValue({
-      ownerId: 'temp-user-id'
-    });
+    console.log('Creating workspace with payload:', this.workspaceForm.value);
 
     this.workspaceService.createWorkspace(this.workspaceForm.value).subscribe({
       next: () => {
+        this.loading = false;
         this.workspaceCreated.emit();
       },
       error: (err) => {
