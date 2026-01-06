@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { WorkspaceService } from '../../../core/services/workspace.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-create-workspace',
@@ -10,7 +12,7 @@ import { WorkspaceService } from '../../../core/services/workspace.service';
   templateUrl: './create-workspace.component.html',
   styleUrl: './create-workspace.component.scss'
 })
-export class CreateWorkspaceComponent {
+export class CreateWorkspaceComponent implements OnInit {
   @Output() workspaceCreated = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
@@ -18,22 +20,38 @@ export class CreateWorkspaceComponent {
   loading = false;
   error = '';
 
-  // TEMP: replace with a real UUID from your DB
-  private readonly TEMP_OWNER_ID = 'bd51eb29-36b6-405e-865c-4fa8f6c0031f';
-
   constructor(
     private fb: FormBuilder,
-    private workspaceService: WorkspaceService
+    private workspaceService: WorkspaceService,
+    private authService: AuthService
   ) {
     this.workspaceForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.maxLength(500)]],
-      ownerId: [this.TEMP_OWNER_ID, Validators.required]
+      ownerId: ['', Validators.required]
     });
+  }
+
+  ngOnInit(): void {
+    const existingUser = this.authService.getCurrentUserSync();
+    if (existingUser?.id) {
+      this.workspaceForm.patchValue({ ownerId: existingUser.id });
+    } else {
+      this.authService.currentUser$.pipe(take(1)).subscribe(user => {
+        if (user?.id) {
+          this.workspaceForm.patchValue({ ownerId: user.id });
+        }
+      });
+    }
   }
 
   onSubmit(): void {
     if (this.workspaceForm.invalid) {
+      return;
+    }
+
+    if (!this.workspaceForm.value.ownerId) {
+      this.error = 'You must be logged in to create a workspace.';
       return;
     }
 

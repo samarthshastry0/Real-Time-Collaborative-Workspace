@@ -26,6 +26,7 @@ export interface AuthResponse {
 })
 export class AuthService {
   private tokenKey = 'auth_token';
+  private userKey = 'auth_user';
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -35,8 +36,9 @@ export class AuthService {
   ) {
     if (isPlatformBrowser(this.platformId)) {
       const token = this.getToken();
-      if (token) {
-        // TODO: Decode JWT and set current user
+      const storedUser = this.getStoredUser();
+      if (token && storedUser) {
+        this.currentUserSubject.next(storedUser);
       }
     }
   }
@@ -56,6 +58,7 @@ export class AuthService {
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userKey);
     }
     this.currentUserSubject.next(null);
   }
@@ -74,7 +77,22 @@ export class AuthService {
   private handleAuthResponse(response: AuthResponse): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(this.tokenKey, response.token);
+      if (response.user) {
+        localStorage.setItem(this.userKey, JSON.stringify(response.user));
+      }
     }
     this.currentUserSubject.next(response.user);
+  }
+
+  private getStoredUser(): any | null {
+    if (!isPlatformBrowser(this.platformId)) {
+      return null;
+    }
+    const raw = localStorage.getItem(this.userKey);
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  getCurrentUserSync(): any | null {
+    return this.currentUserSubject.value;
   }
 }

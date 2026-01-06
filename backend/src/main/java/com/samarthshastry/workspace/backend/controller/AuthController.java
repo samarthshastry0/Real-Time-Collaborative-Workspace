@@ -33,7 +33,9 @@ public class AuthController {
         boolean authenticated = userService.authenticateUser(request.getEmail(), request.getPassword());
         if (authenticated) {
             String token = jwtUtil.generateToken(request.getEmail());
-            return ResponseEntity.ok(Map.of("token", token));
+            return userService.getUserByEmail(request.getEmail())
+                    .map(user -> ResponseEntity.ok(Map.of("token", token, "user", user)))
+                    .orElse(ResponseEntity.badRequest().body(Map.of("error", "User not found")));
         } else {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid credentials"));
         }
