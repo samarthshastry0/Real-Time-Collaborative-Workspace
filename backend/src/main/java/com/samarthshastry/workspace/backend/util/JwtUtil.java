@@ -13,8 +13,8 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "mySecretKeyForJWTTokenGenerationThatIsLongEnoughToBeSecure123456789"; // In production, use environment variable
-    private static final int JWT_EXPIRATION = 86400000; // 24 hours in milliseconds
+    private static final String SECRET = "InfinitelyLongSecretKeyJustToBeSafeForNowCauseWhyNot187823012"; // In production, use environment variable
+    private static final int JWT_EXPIRATION = 86400000; // 24 hours (takes milliseconds)
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
