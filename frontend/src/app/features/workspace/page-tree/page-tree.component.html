@@ -1,0 +1,27 @@
+<div class="page-tree">
+  <div class="page-tree-header">
+    <h3>Pages</h3>
+    <button mat-icon-button (click)="createNewPage()" matTooltip="Add page">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading pages...</div>
+
+  <div *ngIf="!loading && pages.length === 0" class="empty-state">
+    <p>No pages yet. Create one to get started!</p>
+  </div>
+
+  <div *ngIf="!loading && pages.length > 0" class="pages-list">
+    <app-page-tree-item
+      *ngFor="let page of pages"
+      [page]="page"
+      [selectedPageId]="selectedPageId"
+      [isExpanded]="isExpanded(page.id)"
+      (pageSelected)="selectPage($event)"
+      (pageDeleted)="deletePage($event)"
+      (expandToggled)="toggleExpand($event)"
+      (childPageCreated)="createNewPage($event)"
+    ></app-page-tree-item>
+  </div>
+</div>

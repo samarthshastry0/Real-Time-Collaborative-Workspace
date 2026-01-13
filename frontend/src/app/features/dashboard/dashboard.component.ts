@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit {
   }
 
   viewWorkspace(id: string): void {
-    this.router.navigate(['/workspaces', id]);
+    this.router.navigate(['/workspace', id]);
   }
 
   logout(): void {

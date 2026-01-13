@@ -1,0 +1,24 @@
+<div class="block-wrapper">
+  <div [class]="'block ' + getBlockClass()">
+    <div *ngIf="!editing" class="block-display" (click)="startEdit()">
+      <p [class]="'block-content block-' + block.type">{{ block.content || 'Click to add content...' }}</p>
+    </div>
+
+    <div *ngIf="editing" class="block-edit">
+      <textarea
+        [(ngModel)]="contentValue"
+        class="block-textarea"
+        (blur)="saveContent()"
+        (keyup.escape)="cancelEdit()"
+        (keyup.ctrl.enter)="saveContent()"
+        autofocus
+      ></textarea>
+    </div>
+
+    <div class="block-toolbar">
+      <button *ngIf="!editing" mat-icon-button (click)="delete()" class="delete-btn" matTooltip="Delete">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

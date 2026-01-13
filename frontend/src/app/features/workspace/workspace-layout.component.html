@@ -1,0 +1,22 @@
+<div class="workspace-container">
+  <div class="workspace-sidebar">
+    <app-page-tree
+      [workspaceId]="workspaceId"
+      [selectedPageId]="selectedPageId"
+      (pageSelected)="onPageSelected($event)"
+      (newPageCreated)="onNewPageCreated()"
+    ></app-page-tree>
+  </div>
+
+  <div class="workspace-main">
+    <app-page-editor
+      *ngIf="selectedPageId"
+      [workspaceId]="workspaceId"
+      [pageId]="selectedPageId"
+    ></app-page-editor>
+
+    <div *ngIf="!selectedPageId" class="no-page-selected">
+      <p>Select a page or create a new one to get started</p>
+    </div>
+  </div>
+</div>

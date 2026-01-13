@@ -1,0 +1,40 @@
+<div class="page-editor" *ngIf="!loading">
+  <div class="page-header">
+    <div class="page-title">
+      <input
+        *ngIf="editingTitle"
+        [(ngModel)]="titleValue"
+        type="text"
+        class="title-input"
+        (blur)="saveTitle()"
+        (keyup.enter)="saveTitle()"
+        (keyup.escape)="cancelEditTitle()"
+        autofocus
+      />
+      <h1 *ngIf="!editingTitle" (click)="startEditTitle()" class="title-clickable">
+        {{ page?.title }}
+      </h1>
+    </div>
+  </div>
+
+  <div class="blocks-container">
+    <app-block-renderer
+      *ngFor="let block of blocks; let i = index"
+      [block]="block"
+      [pageId]="pageId"
+      (contentUpdated)="updateBlockContent(block.id, $event)"
+      (blockDeleted)="deleteBlock($event)"
+    ></app-block-renderer>
+  </div>
+
+  <div class="add-block">
+    <button mat-button (click)="addBlock('paragraph')" class="add-button">
+      <mat-icon>add</mat-icon>
+      Add block
+    </button>
+  </div>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <p>Loading page...</p>
+</div>

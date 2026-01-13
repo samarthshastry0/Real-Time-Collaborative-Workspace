@@ -1,0 +1,119 @@
+.block-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  &:hover {
+    .block-toolbar {
+      opacity: 1;
+    }
+  }
+
+  .block {
+    flex: 1;
+    position: relative;
+    min-height: 24px;
+    padding: 4px 0;
+
+    .block-display {
+      cursor: text;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #f5f5f5;
+      }
+    }
+
+    .block-content {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #333;
+      white-space: pre-wrap;
+      word-break: break-word;
+
+      &.block-heading1 {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      &.block-heading2 {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      &.block-heading3 {
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      &.block-quote {
+        border-left: 4px solid #ddd;
+        padding-left: 12px;
+        color: #999;
+        font-style: italic;
+      }
+
+      &.block-bulletList::before {
+        content: '• ';
+        margin-right: 8px;
+      }
+
+      &.block-numberedList {
+        counter-increment: list-counter;
+
+        &::before {
+          content: counter(list-counter) '. ';
+          margin-right: 8px;
+        }
+      }
+
+      &.block-codeBlock {
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 12px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        overflow-x: auto;
+      }
+    }
+
+    .block-edit {
+      .block-textarea {
+        width: 100%;
+        min-height: 60px;
+        padding: 8px;
+        font-size: 16px;
+        font-family: inherit;
+        border: 2px solid #2196f3;
+        border-radius: 4px;
+        outline: none;
+        resize: vertical;
+
+        &:focus {
+          border-color: #1976d2;
+          box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+      }
+    }
+  }
+
+  .block-toolbar {
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex;
+    gap: 4px;
+
+    .delete-btn {
+      color: #d32f2f;
+      font-size: 18px;
+
+      &:hover {
+        background-color: rgba(211, 47, 47, 0.1);
+      }
+    }
+  }
+}

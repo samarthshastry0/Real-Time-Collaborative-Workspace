@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -44,6 +45,10 @@ public class Workspace {
     
     @JsonIgnoreProperties({"passwordHash"})
     private Set<User> members = new HashSet<>();
+
+    @OneToMany(mappedBy = "workspace", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"workspace", "blocks"})
+    private List<Page> pages;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

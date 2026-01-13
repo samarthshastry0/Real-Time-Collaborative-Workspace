@@ -1,0 +1,48 @@
+<div class="page-tree-item">
+  <div class="page-item-row" [class.selected]="isSelected()" (click)="onSelect()">
+    <button
+      *ngIf="hasChildren()"
+      mat-icon-button
+      class="expand-btn"
+      (click)="onToggleExpand(); $event.stopPropagation()"
+      [class.expanded]="isExpanded"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <span *ngIf="!hasChildren()" class="spacer"></span>
+
+    <span class="page-name">{{ page.title }}</span>
+
+    <button
+      mat-icon-button
+      class="action-btn"
+      (click)="onDelete($event)"
+      matTooltip="Delete page"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+
+    <button
+      mat-icon-button
+      class="action-btn"
+      (click)="onCreateChild($event)"
+      matTooltip="Add child page"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <div *ngIf="hasChildren() && isExpanded" class="page-children">
+    <app-page-tree-item
+      *ngFor="let child of page.childPages"
+      [page]="child"
+      [selectedPageId]="selectedPageId"
+      [isExpanded]="false"
+      (pageSelected)="pageSelected.emit($event)"
+      (pageDeleted)="pageDeleted.emit($event)"
+      (expandToggled)="expandToggled.emit($event)"
+      (childPageCreated)="childPageCreated.emit($event)"
+    ></app-page-tree-item>
+  </div>
+</div>
