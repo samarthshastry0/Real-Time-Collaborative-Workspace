@@ -13,8 +13,15 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "InfinitelyLongSecretKeyJustToBeSafeForNowCauseWhyNot187823012"; // In production, use environment variable
+    private final String SECRET;
     private static final int JWT_EXPIRATION = 86400000; // 24 hours (takes milliseconds)
+
+    public JwtUtil() {
+        this.SECRET = System.getenv("JWT_SECRET");
+        if (this.SECRET == null || this.SECRET.isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET environment variable is not set. Please configure it before starting the application.");
+        }
+    }
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
